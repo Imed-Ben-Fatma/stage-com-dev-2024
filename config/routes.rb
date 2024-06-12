@@ -2,6 +2,7 @@ Rails.application.routes.draw do
 
 
   put '/users/update', to: 'users/update#update'
+  get '/users/profile', to: 'users/user#profile'
 
 
   
