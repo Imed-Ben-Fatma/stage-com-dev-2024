@@ -1,16 +1,15 @@
-class Users::UpdateController < ApplicationController
+class Users::UserController < ApplicationController
     include RackSessionsFix  
     respond_to :json
-  
-    before_action :authenticate_user!  # Ensure user is authenticated before update
     before_action :set_active_storage_url_options
-
-    def update
+    before_action :authenticate_user!  # Ensure user is authenticated before update
+  
+    def profile
       user = current_user  
   
-      if user.update(update_user_params)
+      if user
         render json: {
-          status: { code: 200, message: 'User profile updated successfully.' },
+          status: { code: 200, message: 'Get user profile' },
           data: UserSerializer.new(user).serializable_hash[:data][:attributes]
         }
       else
@@ -19,15 +18,12 @@ class Users::UpdateController < ApplicationController
         }, status: :unprocessable_entity
       end
     end
-  
-    private
-  
-    def update_user_params
-      params.permit(:name, :avatar) 
-    end
+
     private
 
     def set_active_storage_url_options
       ActiveStorage::Current.url_options = { host: 'http://localhost:3000' }  
     end
+  
+
   end
