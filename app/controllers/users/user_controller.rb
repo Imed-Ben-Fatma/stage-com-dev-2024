@@ -4,6 +4,11 @@ class Users::UserController < ApplicationController
     before_action :set_active_storage_url_options
     before_action :authenticate_user!  # Ensure user is authenticated before update
   
+    def index
+      @users = User.all
+      render json: @users
+    end
+
     def profile
       user = current_user  
   
