@@ -7,15 +7,18 @@ class Users::SessionsController < Devise::SessionsController
   private
 
   def set_active_storage_url_options
-    ActiveStorage::Current.url_options = { host: 'http://localhost:3000' } 
+    ActiveStorage::Current.url_options = { host: 'http://localhost:3000' }
   end
+
+
+
 
   def respond_with(current_user, _opts = {})
     render json: {
       status: { 
         code: 200, message: 'Logged in successfully.',
-        data: { user: UserSerializer.new(current_user).serializable_hash[:data][:attributes] }
-      }
+      },
+      role: current_user.role
     }, status: :ok
   end
 
@@ -24,7 +27,7 @@ class Users::SessionsController < Devise::SessionsController
       jwt_payload = JWT.decode(request.headers['Authorization'].split(' ').last, Rails.application.credentials.devise_jwt_secret_key!).first
       current_user = User.find(jwt_payload['sub'])
     end
-    
+
     if current_user
       render json: {
         status: 200,
