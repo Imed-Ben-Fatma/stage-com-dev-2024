@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_06_06_140507) do
+ActiveRecord::Schema[7.0].define(version: 2024_07_27_223508) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -42,6 +42,89 @@ ActiveRecord::Schema[7.0].define(version: 2024_06_06_140507) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "adresses", force: :cascade do |t|
+    t.string "rue"
+    t.string "ville", null: false
+    t.string "pays", null: false
+    t.string "localisationGPS", null: false
+    t.bigint "post_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["post_id"], name: "index_adresses_on_post_id"
+  end
+
+  create_table "commentaires", force: :cascade do |t|
+    t.text "commentaire", null: false
+    t.bigint "user_id", null: false
+    t.bigint "post_id", null: false
+    t.bigint "reservation_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["post_id"], name: "index_commentaires_on_post_id"
+    t.index ["reservation_id"], name: "index_commentaires_on_reservation_id"
+    t.index ["user_id"], name: "index_commentaires_on_user_id"
+  end
+
+  create_table "equipements", force: :cascade do |t|
+    t.string "nom"
+    t.text "description"
+    t.bigint "post_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["post_id"], name: "index_equipements_on_post_id"
+  end
+
+  create_table "notes", force: :cascade do |t|
+    t.integer "note", null: false
+    t.bigint "reservation_id", null: false
+    t.bigint "post_id", null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["post_id"], name: "index_notes_on_post_id"
+    t.index ["reservation_id"], name: "index_notes_on_reservation_id"
+    t.index ["user_id"], name: "index_notes_on_user_id"
+  end
+
+  create_table "posts", force: :cascade do |t|
+    t.string "titre", null: false
+    t.string "description", null: false
+    t.integer "nbrChambres", default: 0
+    t.integer "nbrLits", default: 0
+    t.integer "prix", null: false
+    t.text "regles", default: ""
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id"
+    t.integer "nbrSalleDeBain"
+    t.boolean "archived", default: false
+    t.boolean "blocked", default: false
+    t.index ["user_id"], name: "index_posts_on_user_id"
+  end
+
+  create_table "reservations", force: :cascade do |t|
+    t.date "dateArrivee", null: false
+    t.date "dateDepart", null: false
+    t.integer "nbrVoyageurs", null: false
+    t.integer "prixTotal", null: false
+    t.string "statut", null: false
+    t.bigint "post_id", null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["post_id"], name: "index_reservations_on_post_id"
+    t.index ["user_id"], name: "index_reservations_on_user_id"
+  end
+
+  create_table "type_logements", force: :cascade do |t|
+    t.string "type"
+    t.string "typePlace"
+    t.bigint "post_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["post_id"], name: "index_type_logements_on_post_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -53,6 +136,14 @@ ActiveRecord::Schema[7.0].define(version: 2024_06_06_140507) do
     t.string "name"
     t.string "jti", null: false
     t.string "avatar"
+    t.string "confirmation_token"
+    t.datetime "confirmed_at"
+    t.datetime "confirmation_sent_at"
+    t.string "unconfirmed_email"
+    t.string "role"
+    t.string "telephone"
+    t.string "status"
+    t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["jti"], name: "index_users_on_jti", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
@@ -60,4 +151,16 @@ ActiveRecord::Schema[7.0].define(version: 2024_06_06_140507) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "adresses", "posts"
+  add_foreign_key "commentaires", "posts"
+  add_foreign_key "commentaires", "reservations"
+  add_foreign_key "commentaires", "users"
+  add_foreign_key "equipements", "posts"
+  add_foreign_key "notes", "posts"
+  add_foreign_key "notes", "reservations"
+  add_foreign_key "notes", "users"
+  add_foreign_key "posts", "users"
+  add_foreign_key "reservations", "posts"
+  add_foreign_key "reservations", "users"
+  add_foreign_key "type_logements", "posts"
 end

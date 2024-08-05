@@ -6,12 +6,26 @@ class Users::UpdateController < ApplicationController
     before_action :set_active_storage_url_options
 
     def update
-      user = current_user  
+      @user = current_user  
   
-      if user.update(update_user_params)
+      if @user.update(update_user_params)
         render json: {
           status: { code: 200, message: 'User profile updated successfully.' },
-          data: UserSerializer.new(user).serializable_hash[:data][:attributes]
+          
+        }
+      else
+        render json: {
+          status: { message: "User profile couldn't be updated. #{user.errors.full_messages.to_sentence}" }
+        }, status: :unprocessable_entity
+      end
+    end
+  
+    def update_user_for_admin
+      user = User.find(params[:id])
+  
+      if user.update(update_user_params_for_admin)
+        render json: {
+           message: 'profile updated successfully.' 
         }
       else
         render json: {
@@ -22,10 +36,15 @@ class Users::UpdateController < ApplicationController
   
     private
   
-    def update_user_params
-      params.permit(:name, :avatar) 
+    def update_user_params_for_admin
+      params.permit(:id, :name, :email,:telephone, :status)
     end
-    private
+    
+    def update_user_params
+      params.permit(:name, :avatar,:email,:telephone) 
+    end
+
+
 
     def set_active_storage_url_options
       ActiveStorage::Current.url_options = { host: 'http://localhost:3000' }  

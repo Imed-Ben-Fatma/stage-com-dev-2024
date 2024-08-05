@@ -1,9 +1,7 @@
-class UserSerializer
-  include JSONAPI::Serializer
-  attributes :id, :email, :name 
-  # Include avatar attribute with a custom getter to return the URL
-  attribute :avatar do |user|
-    # Replace with your logic to retrieve the avatar URL based on user data
-    user.avatar.attached? ? user.avatar.url : nil  # Example using attached avatars
+class UserSerializer < ActiveModel::Serializer
+  attributes :name,:telephone
+
+  def avatar_url
+    Rails.application.routes.url_helpers.rails_blob_url(object.avatar, only_path: true) if object.avatar.attached?
   end
 end

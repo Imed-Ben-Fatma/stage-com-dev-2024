@@ -1,4 +1,7 @@
 class Users::RegistrationsController < Devise::RegistrationsController
+  before_action :configure_sign_up_params, only: [:create]
+  before_action :configure_account_update_params, only: [:update]
+
   include RackSessionsFix
   respond_to :json
   private
@@ -7,7 +10,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
     if resource.persisted?
       render json: {
         status: {code: 200, message: 'Signed up successfully.'},
-        data: UserSerializer.new(current_user).serializable_hash[:data][:attributes]
+        
       }
     else
       render json: {
@@ -15,4 +18,15 @@ class Users::RegistrationsController < Devise::RegistrationsController
       }, status: :unprocessable_entity
     end
   end
+
+  protected
+
+  def configure_sign_up_params
+    devise_parameter_sanitizer.permit(:sign_up, keys: [:role,:telephone])
+  end
+
+  def configure_account_update_params
+    devise_parameter_sanitizer.permit(:account_update, keys: [:role,:telephone])
+  end
+
 end
