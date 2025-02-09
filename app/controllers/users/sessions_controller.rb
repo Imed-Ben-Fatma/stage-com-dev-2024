@@ -18,7 +18,8 @@ class Users::SessionsController < Devise::SessionsController
       status: { 
         code: 200, message: 'Logged in successfully.',
       },
-      role: current_user.role
+      role: current_user.role,
+      userId: current_user.id
     }, status: :ok
   end
 
